@@ -1,0 +1,295 @@
+#name space
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: socket-io
+---
+#redis deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployment
+  namespace: socket-io
+  labels:
+    app: socket
+    tier: redis-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: socket
+      tier: redis-pod
+  template:
+    metadata:
+      name: redis
+      labels:
+        app: socket
+        tier: redis-pod
+    spec:
+      containers:
+      - name: redis
+        image: redis
+        ports:
+        - containerPort: 6379
+---
+#redis service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: socket-io
+  labels:
+    app: socket
+    type: redis-service
+spec:
+  type: NodePort
+  ports:
+    - port: 6379
+      targetPort: 6379
+      nodePort: 30001
+  selector:
+    app: socket
+    tier: redis-pod
+---
+#server-john
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-john-deployment
+  namespace: socket-io
+  labels:
+    app: socket
+    tier: server-john-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: socket
+      tier: server-john-pod
+  template:
+    metadata:
+      name: server-john
+      labels:
+        app: socket
+        tier: server-john-pod
+    spec:
+      containers:
+      - name: server-john
+        image: poojithullasa/server
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NAME
+          value: "John"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-john-service
+  namespace: socket-io
+  labels:
+    app: socket
+    type: server-john-service
+spec:
+  type: NodePort
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30008
+  selector:
+    app: socket
+    tier: server-john-pod
+---
+#server-paul
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-paul-deployment
+  namespace: socket-io
+  labels:
+    app: socket
+    tier: server-paul-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: socket
+      tier: server-paul-pod
+  template:
+    metadata:
+      name: server-paul
+      labels:
+        app: socket
+        tier: server-paul-pod
+    spec:
+      containers:
+      - name: server-paul
+        image: poojithullasa/server
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NAME
+          value: "Paul"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-paul-service
+  namespace: socket-io
+  labels:
+    app: socket
+    type: server-paul-service
+spec:
+  type: NodePort
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30004
+  selector:
+    app: socket
+    tier: server-paul-pod
+---
+#server-george
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-george-deployment
+  namespace: socket-io
+  labels:
+    app: socket
+    tier: server-george-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: socket
+      tier: server-george-pod
+  template:
+    metadata:
+      name: server-george
+      labels:
+        app: socket
+        tier: server-george-pod
+    spec:
+      containers:
+      - name: server-george
+        image: poojithullasa/server
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NAME
+          value: "George"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-george-service
+  namespace: socket-io
+  labels:
+    app: socket
+    type: server-george-service
+spec:
+  type: NodePort
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30005
+  selector:
+    app: socket
+    tier: server-george-pod
+---
+#server-ringo
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-ringo-deployment
+  namespace: socket-io
+  labels:
+    app: socket
+    tier: server-ringo-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: socket
+      tier: server-ringo-pod
+  template:
+    metadata:
+      name: server-ringo
+      labels:
+        app: socket
+        tier: server-ringo-pod
+    spec:
+      containers:
+      - name: server-ringo
+        image: poojithullasa/server
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NAME
+          value: "Ringo"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-ringo-service
+  namespace: socket-io
+  labels:
+    app: socket
+    type: server-ringo-service
+spec:
+  type: NodePort
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30006
+  selector:
+    app: socket
+    tier: server-ringo-pod
+---
+#Haproxy
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: haproxy-deployment
+  namespace: socket-io
+  labels:
+    app: socket
+    tier: haproxy-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: socket
+      tier: haproxy-pod
+  template:
+    metadata:
+      name: haproxy
+      labels:
+        app: socket
+        tier: haproxy-pod
+    spec:
+      containers:
+      - name: haproxy
+        image: poojithullasa/haproxy
+
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: haproxy-service
+  namespace: socket-io
+  labels:
+    app: socket
+    type: haproxy-service
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30010
+  selector:
+    app: socket
+    tier: haproxy-pod
